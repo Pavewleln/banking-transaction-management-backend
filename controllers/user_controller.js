@@ -5,8 +5,6 @@ import UserModel from '../models/User.js'
 
 export const register = async (req, res) => {
     try{   
-        console.log(req.body)
-        console.log(JSON.stringify(req.body))
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10)
         const hash = await bcrypt.hash(password, salt)
@@ -15,6 +13,7 @@ export const register = async (req, res) => {
             email: req.body.email,
             fullname: req.body.fullname,
             passwordHash: hash,
+            avatarUrl: req.body.avatarUrl
         })
     
         const user = await doc.save()
@@ -89,6 +88,26 @@ export const getMe = async (req, res) => {
         console.log(e)
         res.status(404).json({
             message: "Нет доступа"
+        })
+    }
+}
+
+export const update = async (req, res) => {
+    try{
+        const user = await UserModel.findOneAndUpdate(req.userId, {
+            fullname: req.body.fullname,
+            avatarUrl: req.body.avatarUrl
+        },
+        {
+            returnDocument: 'after'
+        })
+        res.json({
+            user
+        })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: "Не удалось изменить данные"
         })
     }
 }
