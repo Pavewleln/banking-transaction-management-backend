@@ -5,7 +5,7 @@ import isAuth from './utils/isAuth.js'
 import { getMe, login, register, update } from './controllers/user_controller.js'
 import { loginValidator, registerValidator } from './validations.js'
 import handleErrors from './utils/handleErrors.js'
-import { createCard, getAllCards, getOneCard, removeCard, transferMoney } from './controllers/card_controller.js'
+import { createCard, getAllCards, getAllCardsNumbers, getOneCard, removeCard, transferMoney } from './controllers/card_controller.js'
 import { AddTransferInHistory, getAllHistoryCard, getAllHistoryUser, getOneHistory } from './controllers/history_transfer.js'
 const app = express()
 import multer from 'multer'
@@ -48,9 +48,10 @@ app.post('/upload', isAuth, upload.single('image'), (req, res) => {
 
 
 // Действия с картами // 
-app.get('/cards', isAuth, getAllCards) // Запросить все свои карты
-app.get('/cards/:id', isAuth, getOneCard) // Запросить конкретную карту
-app.post('/card', isAuth, createCard) // Выпустить новую карту
+app.get('/cards/all', isAuth, getAllCards) // Запросить все свои карты
+app.get('/cards/all/numbers', isAuth, getAllCardsNumbers) // Запросить номера всех своих карт
+app.get('/cards/:number', isAuth, getOneCard) // Запросить конкретную карту
+app.post('/cards/create', isAuth, createCard) // Выпустить новую карту
 app.delete('/cards/:id', isAuth, removeCard) // Закрыть карту
 app.post('/cards/transfer', isAuth, transferMoney) // Перевести деньги
 

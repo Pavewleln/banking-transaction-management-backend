@@ -5,8 +5,8 @@ const CardSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    number: { // Номер карты
-        type: Number,
+    numberCard: { // Номер карты
+        type: String,
         required: true,
         unique: true
     },

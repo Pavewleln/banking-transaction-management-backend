@@ -8,7 +8,7 @@ import { AddTransferInHistory } from './history_transfer.js'
 
 export const getAllCards = async (req, res) => {
     try {
-        const cards = await CardModel.find().populate('user').exec()
+        const cards = await CardModel.find({user: req.userId})
         res.json(cards)
     } catch (e) {
         console.log(e)
@@ -18,30 +18,26 @@ export const getAllCards = async (req, res) => {
     }
 }
 
+export const getAllCardsNumbers = async (req, res) => {
+    try {
+        const cards = await CardModel.find({user: req.userId})
+        const numbers = cards.map((card) => {
+            return card.numberCard
+        })
+        res.json(numbers)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            message: "не удалось получить карты"
+        })
+    }
+}
+
 export const getOneCard = async (req, res) => {
     try {
-        const cardId = req.params.id;
-        await CardModel.findOne(
-            {
-                _id: cardId,
-            },
-            (err, doc) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({
-                        message: 'Не удалось вернуть карту',
-                    });
-                }
-
-                if (!doc) {
-                    return res.status(404).json({
-                        message: 'Карта не найдена',
-                    });
-                }
-
-                res.json(doc);
-            },
-        ).populate('user');
+        const numberCard = req.params.number;
+        const card = await CardModel.findOne({numberCard: numberCard})
+        res.json(card)
     } catch (err) {
         console.log(err);
         res.status(500).json({
@@ -54,7 +50,7 @@ export const createCard = async (req, res) => {
     try {
         const user = await UserModel.findById(req.userId)
         const { fullname } = user
-        const cards = await CardModel.find().populate('user').exec()
+        const cards = await CardModel.find({user: req.userId})
         if (cards.length >= 3) {
             return res.status(404).json({
                 message: "Превышен лимит карт"
@@ -73,12 +69,12 @@ export const createCard = async (req, res) => {
 
         const doc = new CardModel({
             dateOfCreation: dateofCreatedCard(),
-            number: randomCardNumber(),
+            numberCard: randomCardNumber(),
             code: randomCardCode(),
             owner: fullname,
             bankName: "Zarvic",
             user: req.userId,
-            balance: 1000,
+            balance: req.body.currency === CURRENCY_CARD_RUB ? 1000 : 100,
             currency: req.body.currency,
             typeCard: req.body.typeCard
         })
@@ -95,17 +91,16 @@ export const createCard = async (req, res) => {
 
 export const removeCard = async (req, res) => {
     try {
-        const cardId = req.params.id;
-        await CardModel.findByIdAndDelete({
-            _id: cardId
+        CardModel.findByIdAndDelete({
+            _id: req.params.id
         }, (err, doc) => {
-            if (err) {
-                console.log(e)
+            if(err) {
+                console.log(err)
                 return res.status(500).json({
                     message: "Не удалось удалить карту"
                 })
             }
-            if (!doc) {
+            if(!doc) {
                 return res.status(404).json({
                     message: "Карта не найдена"
                 })
@@ -114,8 +109,8 @@ export const removeCard = async (req, res) => {
                 success: true
             })
         })
-    } catch (e) {
-        console.log(e)
+    } catch (err) {
+        console.log(err)
         res.status(500).json({
             message: "Не удалось удалить карту"
         })
@@ -137,8 +132,8 @@ export const transferMoney = async (req, res) => {
         }
 
         // проверка на существование отправителя и получателя
-        const cardSender = await CardModel.findOne({ number: req.body.sender })
-        const cardRecipient = await CardModel.findOne({ number: req.body.recipient })
+        const cardSender = await CardModel.findOne({ numberCard: req.body.sender })
+        const cardRecipient = await CardModel.findOne({ numberCard: req.body.recipient })
 
         if(!cardSender) {
             return res.status(404).json({
@@ -161,7 +156,7 @@ export const transferMoney = async (req, res) => {
         // Перевод получателю
         CardModel.findOneAndUpdate(
             {
-                number: req.body.recipient,
+                numberCard: req.body.recipient,
             },
             {
                 $inc: { balance: req.body.sum },
@@ -187,7 +182,7 @@ export const transferMoney = async (req, res) => {
         // Снятие у отправителя
         CardModel.findOneAndUpdate(
             {
-                number: req.body.sender,
+                numberCard: req.body.sender,
             },
             {
                 $inc: { balance: -req.body.sum },

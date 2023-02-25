@@ -1,15 +1,23 @@
 import HistoryCardModel from "../models/HistoryCard.js"
+import { TYPE_MONEY_ACCOUNT, TYPE_MONEY_CREDIT, TYPE_MONEY_RECEIVING, TYPE_MONEY_TRANSFER } from "../types.js"
 import { dateofCreatedCard } from "../utils/dateOfCreatedCard.js"
 
 export const AddTransferInHistory = async (req, res) => {
     try {
+        if(req.body.moneyType !== TYPE_MONEY_RECEIVING && req.body.moneyType !== TYPE_MONEY_TRANSFER && req.body.moneyType !== TYPE_MONEY_ACCOUNT && req.body.moneyType !== TYPE_MONEY_CREDIT){
+            return res.status(404).json({
+                message: "Не указан тип перевода"
+            })
+        }
+
         const doc = new HistoryCardModel({
             recipient: req.body.recipient,
             date: dateofCreatedCard(),
             sum: req.body.sum,
             card: req.body.card,
             currency: req.body.currency,
-            user: req.userId
+            user: req.userId,
+            moneyType: req.body.moneyType
         })
         const history = await doc.save()
         res.json(history)

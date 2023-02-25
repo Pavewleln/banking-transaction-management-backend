@@ -26,6 +26,10 @@ const HistorySchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    moneyType: { // Тип денег: перечисления, пополнения, счета или кредиты
+        type: String,
+        required: true
+    }
 }, {
     timestamps: true
 })
