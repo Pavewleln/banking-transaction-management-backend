@@ -4,7 +4,6 @@ import { CURRENCY_CARD_RUB, CURRENCY_CARD_USD, TYPE_CARD_CREDIT, TYPE_CARD_DEBIT
 import { dateofCreatedCard } from '../utils/dateOfCreatedCard.js'
 import { randomCardCode } from '../utils/randomCardCode.js'
 import { randomCardNumber } from '../utils/randomCardNumber.js'
-import { AddTransferInHistory } from './history_transfer.js'
 
 export const getAllCards = async (req, res) => {
     try {
@@ -74,7 +73,7 @@ export const createCard = async (req, res) => {
             owner: fullname,
             bankName: "Zarvic",
             user: req.userId,
-            balance: req.body.currency === CURRENCY_CARD_RUB ? 1000 : 100,
+            balance: req.body.currency == CURRENCY_CARD_RUB ? 1000 : (1000/60).toFixed(2),
             currency: req.body.currency,
             typeCard: req.body.typeCard
         })

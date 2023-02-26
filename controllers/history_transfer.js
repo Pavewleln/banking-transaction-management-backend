@@ -17,7 +17,8 @@ export const AddTransferInHistory = async (req, res) => {
             card: req.body.card,
             currency: req.body.currency,
             user: req.userId,
-            moneyType: req.body.moneyType
+            moneyType: req.body.moneyType,
+            numberCardUser: req.body.numberCardUser
         })
         const history = await doc.save()
         res.json(history)
@@ -31,7 +32,7 @@ export const AddTransferInHistory = async (req, res) => {
 
 export const getAllHistoryCard = async (req, res) => {
     try {
-        const histories = await HistoryCardModel.find({ card: req.params.cardId })
+        const histories = await HistoryCardModel.find({ numberCardUser: req.params.cardNumber })
         res.json(histories)
     } catch (err) {
         console.log(err)

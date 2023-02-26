@@ -57,7 +57,7 @@ app.post('/cards/transfer', isAuth, transferMoney) // Перевести ден�
 
 // История //
 app.post('/history', isAuth, AddTransferInHistory) // Добавить в историю
-app.get('/history/card/:cardId', isAuth, getAllHistoryCard) // Вывести историю карты
+app.get('/history/card/:cardNumber', isAuth, getAllHistoryCard) // Вывести историю карты
 app.get('/history/all', isAuth, getAllHistoryUser) // Вывести всю историю пользователя
 app.get('/history/:id', isAuth, getOneHistory) // Вывести определенную историю
 

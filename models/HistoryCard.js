@@ -14,10 +14,14 @@ const HistorySchema = new mongoose.Schema({
         required: true
     },
     card: { // Карта
-        type: Number,
+        type: String,
         required: true
     },
     currency: { // Валюта
+        type: String,
+        required: true
+    },
+    numberCardUser: { // Карта владельца
         type: String,
         required: true
     },
